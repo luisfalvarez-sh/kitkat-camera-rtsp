@@ -4,7 +4,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.net.Uri;
+import android.os.SystemClock;
+import android.view.KeyEvent;
 import android.widget.Toast;
 
 public class IntentHelper {
@@ -33,15 +36,17 @@ public class IntentHelper {
         intent.setComponent(new ComponentName(vlcPkg, vlcAct));
         intent.setDataAndType(Uri.parse(rtspUrl), "video/*");
 
-        // Parámetros de reproducción de VLC
+        // Parámetros de reproducción directa en vivo para VLC
         intent.putExtra("rtsp_tcp", rtspTcp);
         intent.putExtra("rtsp-tcp", rtspTcp);
         intent.putExtra("network_caching", caching);
         intent.putExtra("from_start", true);
         intent.putExtra("position", 0L);
+        intent.putExtra("time", 0L);
 
-        // Banderas para forzar reinicio limpio del reproductor sin pantalla en negro ni pausa
+        // FLAG_ACTIVITY_CLEAR_TASK destruye la actividad en pausa anterior y la reconstruye limpia
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 
@@ -56,6 +61,7 @@ public class IntentHelper {
         try {
             Intent intent = buildVlcIntent(context);
             context.startActivity(intent);
+            sendPlayMediaKey(context);
         } catch (Exception e) {
             if (showToast) {
                 Toast.makeText(context.getApplicationContext(), "Error al abrir VLC: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -67,9 +73,24 @@ public class IntentHelper {
             int caching = prefs.getInt(KEY_NETWORK_CACHING, DEFAULT_CACHING);
             boolean rtspTcp = prefs.getBoolean(KEY_RTSP_TCP, true);
 
-            String cmd = String.format("am start -a android.intent.action.VIEW -n %s/%s -d \"%s\" -t \"video/*\" --ez \"rtsp_tcp\" %b --ei \"network_caching\" %d --ez \"from_start\" true -f 0x14000000",
+            String cmd = String.format("am start -a android.intent.action.VIEW -n %s/%s -d \"%s\" -t \"video/*\" --ez \"rtsp_tcp\" %b --ei \"network_caching\" %d --ez \"from_start\" true -f 0x18000000",
                     vlcPkg, vlcAct, rtspUrl, rtspTcp, caching);
             RootShell.execRoot(cmd);
+            sendPlayMediaKey(context);
+        }
+    }
+
+    private static void sendPlayMediaKey(Context context) {
+        try {
+            AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+            if (am != null) {
+                long eventTime = SystemClock.uptimeMillis();
+                KeyEvent downEvent = new KeyEvent(eventTime, eventTime, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PLAY, 0);
+                KeyEvent upEvent = new KeyEvent(eventTime, eventTime, KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PLAY, 0);
+                am.dispatchMediaKeyEvent(downEvent);
+                am.dispatchMediaKeyEvent(upEvent);
+            }
+        } catch (Exception ignored) {
         }
     }
 }
