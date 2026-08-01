@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cámara Exterior - Guardián"
+            android:textColor="#00E676"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Panel de Control, Parámetros RTSP &amp; Root (Android 4.4)"
+            android:textColor="#B0BEC5"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Status Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#1E1E1E"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Estado del Guardián:"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="● Servicio Detenido"
+                android:textColor="#FF5252"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <!-- Configuration RTSP Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Parámetros de Transmisión RTSP:"
+            android:textColor="#00E676"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="URL de la Cámara RTSP:"
+            android:textColor="#B0BEC5"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/et_rtsp_url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="rtsp://192.168.1.100:8554/live"
+            android:textColor="#FFFFFF"
+            android:background="#262626"
+            android:padding="10dp"
+            android:singleLine="true"
+            android:inputType="textUri"
+            android:layout_marginBottom="10dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginRight="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Caching (ms):"
+                    android:textColor="#B0BEC5"
+                    android:textSize="12sp" />
+
+                <EditText
+                    android:id="@+id/et_network_caching"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="300"
+                    android:textColor="#FFFFFF"
+                    android:background="#262626"
+                    android:padding="10dp"
+                    android:inputType="number"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/cb_rtsp_tcp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text=" Forzar RTSP sobre TCP"
+                android:textColor="#ECEFF1"
+                android:textSize="12sp"
+                android:layout_gravity="center_vertical" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Paquete de la App VLC:"
+            android:textColor="#B0BEC5"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/et_vlc_package"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="org.videolan.vlc"
+            android:textColor="#FFFFFF"
+            android:background="#262626"
+            android:padding="10dp"
+            android:singleLine="true"
+            android:layout_marginBottom="10dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Actividad Reproductora VLC:"
+            android:textColor="#B0BEC5"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/et_vlc_activity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="org.videolan.vlc.gui.video.VideoPlayerActivity"
+            android:textColor="#FFFFFF"
+            android:background="#262626"
+            android:padding="10dp"
+            android:singleLine="true"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Behavioral Options -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Comportamiento del Guardián:"
+            android:textColor="#00E676"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <CheckBox
+            android:id="@+id/cb_boot_start"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=" Iniciar al encender la tablet (Autostart)"
+            android:textColor="#ECEFF1"
+            android:textSize="13sp"
+            android:padding="6dp" />
+
+        <CheckBox
+            android:id="@+id/cb_watchdog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=" Monitorear y reactivar VLC si se cierra"
+            android:textColor="#ECEFF1"
+            android:textSize="13sp"
+            android:padding="6dp" />
+
+        <CheckBox
+            android:id="@+id/cb_persistent_notif"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=" Proceso protegido (Notificación en barra)"
+            android:textColor="#ECEFF1"
+            android:textSize="13sp"
+            android:padding="6dp" />
+
+        <CheckBox
+            android:id="@+id/cb_use_root"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=" Utilizar privilegios ROOT (su 0)"
+            android:textColor="#ECEFF1"
+            android:textSize="13sp"
+            android:padding="6dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Buttons -->
+        <Button
+            android:id="@+id/btn_save_config"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Guardar Parámetros"
+            android:background="#7C4DFF"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp" />
+
+        <Button
+            android:id="@+id/btn_launch_now"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Lanzar Cámara Ahora"
+            android:background="#00C853"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp" />
+
+        <Button
+            android:id="@+id/btn_toggle_service"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Iniciar Servicio Guardián"
+            android:background="#29B6F6"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+    </LinearLayout>
+</ScrollView>
