@@ -1,5 +1,6 @@
 package com.digitalservices.cooau;
 
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -44,7 +45,7 @@ public class IntentHelper {
         intent.putExtra("position", 0L);
         intent.putExtra("time", 0L);
 
-        // FLAG_ACTIVITY_CLEAR_TASK destruye la actividad en pausa anterior y la reconstruye limpia
+        // Banderas para forzar reinicio limpio del reproductor
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -58,6 +59,24 @@ public class IntentHelper {
             Toast.makeText(context.getApplicationContext(), context.getString(R.string.toast_opening), Toast.LENGTH_SHORT).show();
         }
 
+        SharedPreferences prefs = context.getSharedPreferences(CameraWatchdogService.PREFS_NAME, Context.MODE_PRIVATE);
+        String vlcPkg = prefs.getString(KEY_VLC_PACKAGE, DEFAULT_PKG);
+        boolean useRoot = prefs.getBoolean(CameraWatchdogService.KEY_USE_ROOT, false);
+
+        // 1. Matar procesos previos en segundo plano para liberar decodificadores de video y evitar pantalla negra
+        try {
+            ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            if (am != null) {
+                am.killBackgroundProcesses(vlcPkg);
+            }
+        } catch (Exception ignored) {
+        }
+
+        if (useRoot) {
+            RootShell.execRoot("am force-stop " + vlcPkg);
+        }
+
+        // 2. Lanzar reproductor de VLC limpio
         try {
             Intent intent = buildVlcIntent(context);
             context.startActivity(intent);
@@ -66,9 +85,7 @@ public class IntentHelper {
             if (showToast) {
                 Toast.makeText(context.getApplicationContext(), "Error al abrir VLC: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
-            SharedPreferences prefs = context.getSharedPreferences(CameraWatchdogService.PREFS_NAME, Context.MODE_PRIVATE);
             String rtspUrl = prefs.getString(KEY_RTSP_URL, DEFAULT_URL);
-            String vlcPkg = prefs.getString(KEY_VLC_PACKAGE, DEFAULT_PKG);
             String vlcAct = prefs.getString(KEY_VLC_ACTIVITY, DEFAULT_ACT);
             int caching = prefs.getInt(KEY_NETWORK_CACHING, DEFAULT_CACHING);
             boolean rtspTcp = prefs.getBoolean(KEY_RTSP_TCP, true);
