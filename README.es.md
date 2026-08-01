@@ -2,7 +2,9 @@
 
 [🇺🇸 English Version](README.md) | **🇪🇸 Versión en Español**
 
-**KitKat Camera RTSP** es una aplicación e infraestructura guardián (*Watchdog*) diseñada para reutilizar tablets y dispositivos antiguos con **Android 4.4 KitKat (API 19)** (con o sin privilegios **Root**) como monitores dedicados de vídeo de seguridad RTSP usando VLC 2.x (`org.videolan.vlc`).
+**KitKat Camera RTSP** es una aplicación e infraestructura guardián (*Watchdog*) diseñada para reutilizar tablets y dispositivos antiguos con **Android 4.4 KitKat (API 19)** (con o sin privilegios **Root**) como monitores dedicados de vídeo de seguridad RTSP usando VLC (`org.videolan.vlc`).
+
+> 💡 **Compatibilidad de VLC:** Probado y optimizado específicamente para **VLC versión 2.0.6** en Android 4.4 KitKat, aunque el flujo de Intents es compatible con versiones posteriores de VLC que soporten KitKat.
 
 ---
 
