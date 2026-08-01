@@ -91,12 +91,10 @@ public class CameraWatchdogService extends Service {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingMainIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        // Action Intent para alternar Guardián desde la barra de notificaciones
         Intent toggleIntent = new Intent(this, CameraWatchdogService.class);
         toggleIntent.setAction(ACTION_TOGGLE);
         PendingIntent pendingToggleIntent = PendingIntent.getService(this, 1, toggleIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        // Action Intent para Apagar el Servicio
         Intent stopIntent = new Intent(this, CameraWatchdogService.class);
         stopIntent.setAction(ACTION_STOP);
         PendingIntent pendingStopIntent = PendingIntent.getService(this, 2, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -105,7 +103,7 @@ public class CameraWatchdogService extends Service {
         String statusText = watchdogActive ? "Monitoreando transmisión RTSP activa" : "Guardián pausado";
 
         Notification notification = new Notification.Builder(this)
-                .setContentTitle("Cámara Exterior Guardián")
+                .setContentTitle("KitKat Camera RTSP Guardián")
                 .setContentText(statusText)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(pendingMainIntent)
