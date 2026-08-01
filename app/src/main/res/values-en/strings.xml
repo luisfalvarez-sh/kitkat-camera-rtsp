@@ -3,6 +3,7 @@
     <string name="sub_header">Control Panel, RTSP Parameters &amp; Root (Android 4.4)</string>
     <string name="status_label">Guardian Status:</string>
     <string name="status_active">● Watchdog Service Active</string>
+    <string name="status_paused">● Watchdog Service Paused</string>
     <string name="status_stopped">● Service Stopped</string>
     <string name="rtsp_params_header">RTSP Stream Parameters:</string>
     <string name="rtsp_url_label">RTSP Camera URL:</string>

@@ -12,7 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private EditText etRtspUrl;
     private EditText etNetworkCaching;
@@ -48,8 +48,28 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        prefs.registerOnSharedPreferenceChangeListener(this);
         loadPreferences();
         updateServiceUIStatus();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        prefs.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (CameraWatchdogService.KEY_WATCHDOG.equals(key) || CameraWatchdogService.KEY_SERVICE_STATE.equals(key)) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    loadPreferences();
+                    updateServiceUIStatus();
+                }
+            });
+        }
     }
 
     private void initViews() {
@@ -179,9 +199,16 @@ public class MainActivity extends Activity {
 
     private void updateServiceUIStatus() {
         boolean isRunning = CameraWatchdogService.isServiceRunning(this);
+        boolean watchdogEnabled = prefs.getBoolean(CameraWatchdogService.KEY_WATCHDOG, true);
+
         if (isRunning) {
-            tvStatus.setText(getString(R.string.status_active));
-            tvStatus.setTextColor(Color.parseColor("#00E676"));
+            if (watchdogEnabled) {
+                tvStatus.setText(getString(R.string.status_active));
+                tvStatus.setTextColor(Color.parseColor("#00E676"));
+            } else {
+                tvStatus.setText(getString(R.string.status_paused));
+                tvStatus.setTextColor(Color.parseColor("#FFB300"));
+            }
             btnToggleService.setText(getString(R.string.btn_stop_service));
             btnToggleService.setBackgroundColor(Color.parseColor("#FF5252"));
         } else {
