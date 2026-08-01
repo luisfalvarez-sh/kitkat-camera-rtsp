@@ -4,7 +4,7 @@
 
 **KitKat Camera RTSP** is an application and Watchdog service designed to repurpose legacy tablets and devices running **Android 4.4 KitKat (API 19)** (with or without **Root** privileges) as dedicated RTSP security video monitors using VLC (`org.videolan.vlc`).
 
-> 💡 **VLC Compatibility:** Tested and optimized specifically for **VLC version 2.0.6** on Android 4.4 KitKat, although the Intent structure remains compatible with newer VLC releases supporting KitKat.
+> 💡 **VLC Compatibility & Clean Relaunch:** Tested and optimized specifically for **VLC version 2.0.6** on Android 4.4 KitKat. Whenever the Watchdog detects a network drop, video freeze, or player closure, **it terminates stale background processes and launches VLC in a 100% fresh session**, ensuring live video playback resumes automatically and seamlessly without requiring manual play interaction.
 
 ---
 
@@ -18,24 +18,27 @@
    - Persistent storage in local database (`SharedPreferences`).
 
 2. **Watchdog Service:**
-   - Continuous background monitoring loop (every 7 seconds).
-   - Checks VLC process health. If a network drop or player crash occurs, **it automatically relaunches the stream**.
+   - Asynchronous background monitoring loop on a worker thread (`ScheduledExecutorService`) to prevent UI freezes / ANRs.
+   - Checks real-time foreground screen activity (`VideoPlayerActivity`).
+   - If a stream stall or exit is detected, **it terminates stale processes and automatically resumes live playback**.
 
-3. **Persistent & Interactive Notification:**
+3. **Configurable Check Interval:**
+   - Customizable watchdog scan frequency setting in seconds (default 7s).
+
+4. **Persistent & Interactive Notification:**
    - Runs a `Foreground Service` on Android 4.4.
-   - Features **direct action buttons inside the notification**:
-     - ⏯ **Pause/Resume Watchdog**: Toggles monitoring without stopping the service.
-     - ✖ **Stop Service**: Stops the service and frees system memory.
+   - Features **direct action buttons backed by a `BroadcastReceiver`**:
+     - ⏯ **Pause/Resume Watchdog**: Toggles monitoring without stopping the service or mutating your preference checkboxes.
+     - ✖ **Stop Service**: Immediately stops the service and frees system memory.
 
-4. **Autostart on Boot (Boot Receiver):**
+5. **Autostart on Boot (Boot Receiver):**
    - Listens to `android.intent.action.BOOT_COMPLETED`.
    - On device boot, the app starts automatically in the background and opens the camera stream if *Autostart* is enabled.
 
-5. **Root Privileges Support (`su 0`):**
-   - Queries Linux kernel process table (`su 0 ps`) to bypass process isolation.
-   - Relaunches the Intent with elevated Superuser privileges on failure.
+6. **Root Privileges Support (`su 0`):**
+   - Queries Linux kernel process table (`su 0 ps`) and forces process termination (`am force-stop`) for hardware fallback.
 
-6. **1x1 Desktop Widget (AppWidget):**
+7. **1x1 Desktop Widget (AppWidget):**
    - 1-tap quick launcher icon for the Android 4.4 home screen.
 
 ---
@@ -44,9 +47,10 @@
 
 Built in pure native Java for API 19 (Android 4.4):
 
-* **[`MainActivity.java`](app/src/main/java/com/digitalservices/cooau/MainActivity.java):** Interactive panel with multi-language localization (Spanish / English).
-* **[`CameraWatchdogService.java`](app/src/main/java/com/digitalservices/cooau/CameraWatchdogService.java):** Main background service with interactive status bar notification.
-* **[`IntentHelper.java`](app/src/main/java/com/digitalservices/cooau/IntentHelper.java):** Dynamic RTSP Intent builder.
+* **[`MainActivity.java`](app/src/main/java/com/digitalservices/cooau/MainActivity.java):** Interactive panel with multi-language localization (Spanish / English) and real-time status updates.
+* **[`CameraWatchdogService.java`](app/src/main/java/com/digitalservices/cooau/CameraWatchdogService.java):** Main asynchronous background service (`ScheduledExecutorService`).
+* **[`NotificationActionReceiver.java`](app/src/main/java/com/digitalservices/cooau/NotificationActionReceiver.java):** BroadcastReceiver for status bar notification action buttons.
+* **[`IntentHelper.java`](app/src/main/java/com/digitalservices/cooau/IntentHelper.java):** Dynamic RTSP Intent builder featuring task clearing (`CLEAR_TASK`), live playback parameters (`from_start`), and process cleanup (`killBackgroundProcesses`).
 * **[`RootShell.java`](app/src/main/java/com/digitalservices/cooau/RootShell.java):** Root console execution module (`su 0`).
 * **[`BootReceiver.java`](app/src/main/java/com/digitalservices/cooau/BootReceiver.java):** System boot event receiver.
 * **[`CameraWidgetProvider.java`](app/src/main/java/com/digitalservices/cooau/CameraWidgetProvider.java):** 1x1 Home Screen widget provider.
