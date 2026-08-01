@@ -1,63 +1,65 @@
 # KitKat Camera RTSP (Android 4.4 KitKat)
 
-**KitKat Camera RTSP** es una aplicación e infraestructura guardián (*Watchdog*) diseñada para reutilizar tablets y dispositivos antiguos con **Android 4.4 KitKat (API 19)** (con o sin privilegios **Root**) como monitores dedicados de vídeo de seguridad RTSP usando VLC 2.x (`org.videolan.vlc`).
+**English Version** | [🇪🇸 Versión en Español](README.es.md)
+
+**KitKat Camera RTSP** is an application and Watchdog service designed to repurpose legacy tablets and devices running **Android 4.4 KitKat (API 19)** (with or without **Root** privileges) as dedicated RTSP security video monitors using VLC 2.x (`org.videolan.vlc`).
 
 ---
 
-## 🚀 Características Principales
+## 🚀 Key Features
 
-1. **Panel de Control con Parámetros Dinámicos:**
-   - Configuración de la **URL RTSP** objetivo.
-   - Ajuste de **Caching de red (ms)**.
-   - Conmutador para **Forzar RTSP sobre TCP**.
-   - Ajuste de paquete y actividad del reproductor objetivo (`org.videolan.vlc`).
-   - Almacenamiento persistente en base de datos local (`SharedPreferences`).
+1. **Control Panel with Dynamic Parameters:**
+   - Target **RTSP URL** configuration.
+   - **Network caching (ms)** adjustment.
+   - Toggle to **Force RTSP over TCP**.
+   - Target player package and activity settings (`org.videolan.vlc`).
+   - Persistent storage in local database (`SharedPreferences`).
 
-2. **Servicio Guardián (Watchdog Service):**
-   - Bucle de monitoreo continuo en segundo plano (cada 7 segundos).
-   - Comprueba la salud del proceso de VLC. Si detecta caída de red o cierre del reproductor, **lo reactiva automáticamente**.
+2. **Watchdog Service:**
+   - Continuous background monitoring loop (every 7 seconds).
+   - Checks VLC process health. If a network drop or player crash occurs, **it automatically relaunches the stream**.
 
-3. **Notificación Persistente e Interactiva:**
-   - Mantiene un servicio en primer plano (`Foreground Service`) en Android 4.4.
-   - Incluye **botones de acción directa en la notificación**:
-     - ⏯ **Pausar/Activar Guardián**: Alterna el monitoreo sin apagar el servicio.
-     - ✖ **Apagar Servicio**: Detiene el servicio y libera memoria del sistema.
+3. **Persistent & Interactive Notification:**
+   - Runs a `Foreground Service` on Android 4.4.
+   - Features **direct action buttons inside the notification**:
+     - ⏯ **Pause/Resume Watchdog**: Toggles monitoring without stopping the service.
+     - ✖ **Stop Service**: Stops the service and frees system memory.
 
-4. **Auto-Inicio al Encender (Boot Receiver):**
-   - Escucha `android.intent.action.BOOT_COMPLETED`.
-   - Al encender la tablet, la app se inicia automáticamente en segundo plano y abre la cámara si el switch de *Autostart* está activo.
+4. **Autostart on Boot (Boot Receiver):**
+   - Listens to `android.intent.action.BOOT_COMPLETED`.
+   - On device boot, the app starts automatically in the background and opens the camera stream if *Autostart* is enabled.
 
-5. **Soporte de Privilegios Root (`su 0`):**
-   - Consulta la tabla de procesos del kernel Linux (`su 0 ps`) para evadir aislamiento de procesos.
-   - Relanza el Intent con privilegios elevados de Superusuario en caso de fallos.
+5. **Root Privileges Support (`su 0`):**
+   - Queries Linux kernel process table (`su 0 ps`) to bypass process isolation.
+   - Relaunches the Intent with elevated Superuser privileges on failure.
 
-6. **Widget de Escritorio 1x1 (AppWidget):**
-   - Icono de acceso rápido de 1 toque para el lanzador de Android 4.4.
-
----
-
-## 🛠️ Arquitectura de Código
-
-Construido en Java puro nativo para API 19 (Android 4.4):
-
-* **[`MainActivity.java`](app/src/main/java/com/digitalservices/cooau/MainActivity.java):** Panel interactivo con verificación dinámica del estado real del servicio en el SO.
-* **[`CameraWatchdogService.java`](app/src/main/java/com/digitalservices/cooau/CameraWatchdogService.java):** Servicio principal en segundo plano con notificación interactiva.
-* **[`IntentHelper.java`](app/src/main/java/com/digitalservices/cooau/IntentHelper.java):** Constructor de Intents RTSP dinámicos.
-* **[`RootShell.java`](app/src/main/java/com/digitalservices/cooau/RootShell.java):** Módulo de comandos de consola root (`su 0`).
-* **[`BootReceiver.java`](app/src/main/java/com/digitalservices/cooau/BootReceiver.java):** Receptor de eventos de arranque de sistema.
-* **[`CameraWidgetProvider.java`](app/src/main/java/com/digitalservices/cooau/CameraWidgetProvider.java):** Proveedor del widget 1x1 de escritorio.
+6. **1x1 Desktop Widget (AppWidget):**
+   - 1-tap quick launcher icon for the Android 4.4 home screen.
 
 ---
 
-## 📦 Compilación
+## 🛠️ Code Architecture
+
+Built in pure native Java for API 19 (Android 4.4):
+
+* **[`MainActivity.java`](app/src/main/java/com/digitalservices/cooau/MainActivity.java):** Interactive panel with multi-language localization (Spanish / English).
+* **[`CameraWatchdogService.java`](app/src/main/java/com/digitalservices/cooau/CameraWatchdogService.java):** Main background service with interactive status bar notification.
+* **[`IntentHelper.java`](app/src/main/java/com/digitalservices/cooau/IntentHelper.java):** Dynamic RTSP Intent builder.
+* **[`RootShell.java`](app/src/main/java/com/digitalservices/cooau/RootShell.java):** Root console execution module (`su 0`).
+* **[`BootReceiver.java`](app/src/main/java/com/digitalservices/cooau/BootReceiver.java):** System boot event receiver.
+* **[`CameraWidgetProvider.java`](app/src/main/java/com/digitalservices/cooau/CameraWidgetProvider.java):** 1x1 Home Screen widget provider.
+
+---
+
+## 📦 Build
 
 ```bash
 ./gradlew assembleDebug --no-daemon
 ```
-El instalador APK resultante se encuentra en: `app/build/outputs/apk/debug/app-debug.apk`.
+The resulting APK installer will be located at: `app/build/outputs/apk/debug/app-debug.apk`.
 
 ---
 
-## 📄 Licencia
-Este proyecto se distribuye bajo la licencia **MIT License**.  
-Creador & Autor: **Luis Alvarez** ([@luisfalvarez-sh](https://github.com/luisfalvarez-sh)).
+## 📄 License
+This project is licensed under the **MIT License**.  
+Creator & Author: **Luis Alvarez** ([@luisfalvarez-sh](https://github.com/luisfalvarez-sh)).

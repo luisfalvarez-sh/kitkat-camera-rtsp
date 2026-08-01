@@ -1,3 +1,32 @@
 <resources>
     <string name="app_name">KitKat Camera RTSP</string>
+    <string name="sub_header">Panel de Control, Parámetros RTSP &amp; Root (Android 4.4)</string>
+    <string name="status_label">Estado del Guardián:</string>
+    <string name="status_active">● Servicio Guardián Activo</string>
+    <string name="status_stopped">● Servicio Detenido</string>
+    <string name="rtsp_params_header">Parámetros de Transmisión RTSP:</string>
+    <string name="rtsp_url_label">URL de la Cámara RTSP:</string>
+    <string name="caching_label">Caching (ms):</string>
+    <string name="force_tcp_label">Forzar RTSP sobre TCP</string>
+    <string name="vlc_pkg_label">Paquete de la App VLC:</string>
+    <string name="vlc_act_label">Actividad Reproductora VLC:</string>
+    <string name="behavior_header">Comportamiento del Guardián:</string>
+    <string name="boot_start_label">Iniciar al encender la tablet (Autostart)</string>
+    <string name="watchdog_label">Monitorear y reactivar VLC si se cierra</string>
+    <string name="persistent_notif_label">Proceso protegido (Notificación en barra)</string>
+    <string name="use_root_label">Utilizar privilegios ROOT (su 0)</string>
+    <string name="btn_save">Guardar Parámetros</string>
+    <string name="btn_launch_now">Lanzar Cámara Ahora</string>
+    <string name="btn_start_service">Iniciar Servicio Guardián</string>
+    <string name="btn_stop_service">Detener Servicio Guardián</string>
+    <string name="toast_opening">Abriendo cámara...</string>
+    <string name="toast_saved">Parámetros RTSP guardados correctamente</string>
+    <string name="toast_started">Servicio Guardián Iniciado</string>
+    <string name="toast_stopped">Servicio Guardián Detenido</string>
+    <string name="notif_title">KitKat Camera RTSP Guardián</string>
+    <string name="notif_active">Monitoreando transmisión RTSP activa</string>
+    <string name="notif_paused">Guardián pausado</string>
+    <string name="notif_pause">Pausar Guardián</string>
+    <string name="notif_resume">Activar Guardián</string>
+    <string name="notif_stop">Apagar Servicio</string>
 </resources>

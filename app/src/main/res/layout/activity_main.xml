@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cámara Exterior - Guardián"
+            android:text="@string/app_name"
             android:textColor="#00E676"
             android:textSize="22sp"
             android:textStyle="bold"
@@ -24,7 +24,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Panel de Control, Parámetros RTSP &amp; Root (Android 4.4)"
+            android:text="@string/sub_header"
             android:textColor="#B0BEC5"
             android:textSize="12sp"
             android:gravity="center"
@@ -42,7 +42,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Estado del Guardián:"
+                android:text="@string/status_label"
                 android:textColor="#FFFFFF"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -51,7 +51,7 @@
                 android:id="@+id/tv_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="● Servicio Detenido"
+                android:text="@string/status_stopped"
                 android:textColor="#FF5252"
                 android:textSize="15sp"
                 android:textStyle="bold"
@@ -62,7 +62,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Parámetros de Transmisión RTSP:"
+            android:text="@string/rtsp_params_header"
             android:textColor="#00E676"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -71,7 +71,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="URL de la Cámara RTSP:"
+            android:text="@string/rtsp_url_label"
             android:textColor="#B0BEC5"
             android:textSize="12sp" />
 
@@ -103,7 +103,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Caching (ms):"
+                    android:text="@string/caching_label"
                     android:textColor="#B0BEC5"
                     android:textSize="12sp" />
 
@@ -124,7 +124,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text=" Forzar RTSP sobre TCP"
+                android:text="@string/force_tcp_label"
                 android:textColor="#ECEFF1"
                 android:textSize="12sp"
                 android:layout_gravity="center_vertical" />
@@ -133,7 +133,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Paquete de la App VLC:"
+            android:text="@string/vlc_pkg_label"
             android:textColor="#B0BEC5"
             android:textSize="12sp" />
 
@@ -151,7 +151,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Actividad Reproductora VLC:"
+            android:text="@string/vlc_act_label"
             android:textColor="#B0BEC5"
             android:textSize="12sp" />
 
@@ -170,7 +170,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Comportamiento del Guardián:"
+            android:text="@string/behavior_header"
             android:textColor="#00E676"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -180,7 +180,7 @@
             android:id="@+id/cb_boot_start"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=" Iniciar al encender la tablet (Autostart)"
+            android:text="@string/boot_start_label"
             android:textColor="#ECEFF1"
             android:textSize="13sp"
             android:padding="6dp" />
@@ -189,7 +189,7 @@
             android:id="@+id/cb_watchdog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=" Monitorear y reactivar VLC si se cierra"
+            android:text="@string/watchdog_label"
             android:textColor="#ECEFF1"
             android:textSize="13sp"
             android:padding="6dp" />
@@ -198,7 +198,7 @@
             android:id="@+id/cb_persistent_notif"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=" Proceso protegido (Notificación en barra)"
+            android:text="@string/persistent_notif_label"
             android:textColor="#ECEFF1"
             android:textSize="13sp"
             android:padding="6dp" />
@@ -207,7 +207,7 @@
             android:id="@+id/cb_use_root"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=" Utilizar privilegios ROOT (su 0)"
+            android:text="@string/use_root_label"
             android:textColor="#ECEFF1"
             android:textSize="13sp"
             android:padding="6dp"
@@ -218,7 +218,7 @@
             android:id="@+id/btn_save_config"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="Guardar Parámetros"
+            android:text="@string/btn_save"
             android:background="#7C4DFF"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
@@ -229,7 +229,7 @@
             android:id="@+id/btn_launch_now"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="Lanzar Cámara Ahora"
+            android:text="@string/btn_launch_now"
             android:background="#00C853"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
@@ -240,7 +240,7 @@
             android:id="@+id/btn_toggle_service"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="Iniciar Servicio Guardián"
+            android:text="@string/btn_start_service"
             android:background="#29B6F6"
             android:textColor="#FFFFFF"
             android:textSize="14sp"

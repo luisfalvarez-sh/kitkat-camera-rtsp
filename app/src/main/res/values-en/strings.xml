@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">KitKat Camera RTSP</string>
+    <string name="sub_header">Control Panel, RTSP Parameters &amp; Root (Android 4.4)</string>
+    <string name="status_label">Guardian Status:</string>
+    <string name="status_active">● Watchdog Service Active</string>
+    <string name="status_stopped">● Service Stopped</string>
+    <string name="rtsp_params_header">RTSP Stream Parameters:</string>
+    <string name="rtsp_url_label">RTSP Camera URL:</string>
+    <string name="caching_label">Caching (ms):</string>
+    <string name="force_tcp_label">Force RTSP over TCP</string>
+    <string name="vlc_pkg_label">VLC App Package:</string>
+    <string name="vlc_act_label">VLC Player Activity:</string>
+    <string name="behavior_header">Watchdog Behavior:</string>
+    <string name="boot_start_label">Autostart on boot</string>
+    <string name="watchdog_label">Monitor and relaunch VLC if closed</string>
+    <string name="persistent_notif_label">Protected process (Foreground Notification)</string>
+    <string name="use_root_label">Use ROOT privileges (su 0)</string>
+    <string name="btn_save">Save Parameters</string>
+    <string name="btn_launch_now">Launch Camera Now</string>
+    <string name="btn_start_service">Start Watchdog Service</string>
+    <string name="btn_stop_service">Stop Watchdog Service</string>
+    <string name="toast_opening">Opening camera...</string>
+    <string name="toast_saved">RTSP parameters saved successfully</string>
+    <string name="toast_started">Watchdog Service Started</string>
+    <string name="toast_stopped">Watchdog Service Stopped</string>
+    <string name="notif_title">KitKat Camera RTSP Watchdog</string>
+    <string name="notif_active">Monitoring active RTSP stream</string>
+    <string name="notif_paused">Watchdog paused</string>
+    <string name="notif_pause">Pause Watchdog</string>
+    <string name="notif_resume">Resume Watchdog</string>
+    <string name="notif_stop">Stop Service</string>
+</resources>

@@ -121,7 +121,7 @@ public class MainActivity extends Activity {
                 if (CameraWatchdogService.isServiceRunning(MainActivity.this)) {
                     startService(new Intent(MainActivity.this, CameraWatchdogService.class));
                 }
-                Toast.makeText(MainActivity.this, "Parámetros RTSP guardados correctamente", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, getString(R.string.toast_saved), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -156,10 +156,10 @@ public class MainActivity extends Activity {
                 Intent intent = new Intent(MainActivity.this, CameraWatchdogService.class);
                 if (CameraWatchdogService.isServiceRunning(MainActivity.this)) {
                     stopService(intent);
-                    Toast.makeText(MainActivity.this, "Servicio Guardián Detenido", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, getString(R.string.toast_stopped), Toast.LENGTH_SHORT).show();
                 } else {
                     startService(intent);
-                    Toast.makeText(MainActivity.this, "Servicio Guardián Iniciado", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, getString(R.string.toast_started), Toast.LENGTH_SHORT).show();
                 }
                 updateServiceUIStatus();
             }
@@ -169,14 +169,14 @@ public class MainActivity extends Activity {
     private void updateServiceUIStatus() {
         boolean isRunning = CameraWatchdogService.isServiceRunning(this);
         if (isRunning) {
-            tvStatus.setText("● Servicio Guardián Activo");
+            tvStatus.setText(getString(R.string.status_active));
             tvStatus.setTextColor(Color.parseColor("#00E676"));
-            btnToggleService.setText("Detener Servicio Guardián");
+            btnToggleService.setText(getString(R.string.btn_stop_service));
             btnToggleService.setBackgroundColor(Color.parseColor("#FF5252"));
         } else {
-            tvStatus.setText("● Servicio Detenido");
+            tvStatus.setText(getString(R.string.status_stopped));
             tvStatus.setTextColor(Color.parseColor("#FF5252"));
-            btnToggleService.setText("Iniciar Servicio Guardián");
+            btnToggleService.setText(getString(R.string.btn_start_service));
             btnToggleService.setBackgroundColor(Color.parseColor("#29B6F6"));
         }
     }

@@ -99,17 +99,17 @@ public class CameraWatchdogService extends Service {
         stopIntent.setAction(ACTION_STOP);
         PendingIntent pendingStopIntent = PendingIntent.getService(this, 2, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        String toggleText = watchdogActive ? "Pausar Guardián" : "Activar Guardián";
-        String statusText = watchdogActive ? "Monitoreando transmisión RTSP activa" : "Guardián pausado";
+        String toggleText = watchdogActive ? getString(R.string.notif_pause) : getString(R.string.notif_resume);
+        String statusText = watchdogActive ? getString(R.string.notif_active) : getString(R.string.notif_paused);
 
         Notification notification = new Notification.Builder(this)
-                .setContentTitle("KitKat Camera RTSP Guardián")
+                .setContentTitle(getString(R.string.notif_title))
                 .setContentText(statusText)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(pendingMainIntent)
                 .setOngoing(true)
                 .addAction(android.R.drawable.ic_media_pause, toggleText, pendingToggleIntent)
-                .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Apagar Servicio", pendingStopIntent)
+                .addAction(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string.notif_stop), pendingStopIntent)
                 .build();
 
         startForeground(NOTIFICATION_ID, notification);
