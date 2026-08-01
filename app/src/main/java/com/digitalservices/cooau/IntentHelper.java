@@ -31,16 +31,26 @@ public class IntentHelper {
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setComponent(new ComponentName(vlcPkg, vlcAct));
-        intent.setData(Uri.parse(rtspUrl));
+        intent.setDataAndType(Uri.parse(rtspUrl), "video/*");
+
+        // Parámetros de reproducción de VLC
         intent.putExtra("rtsp_tcp", rtspTcp);
+        intent.putExtra("rtsp-tcp", rtspTcp);
         intent.putExtra("network_caching", caching);
+        intent.putExtra("from_start", true);
+        intent.putExtra("position", 0L);
+
+        // Banderas para forzar reinicio limpio del reproductor sin pantalla en negro ni pausa
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+
         return intent;
     }
 
     public static void launchCamera(Context context, boolean showToast) {
         if (showToast) {
-            Toast.makeText(context.getApplicationContext(), "Abriendo cámara...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context.getApplicationContext(), context.getString(R.string.toast_opening), Toast.LENGTH_SHORT).show();
         }
 
         try {
@@ -57,7 +67,7 @@ public class IntentHelper {
             int caching = prefs.getInt(KEY_NETWORK_CACHING, DEFAULT_CACHING);
             boolean rtspTcp = prefs.getBoolean(KEY_RTSP_TCP, true);
 
-            String cmd = String.format("am start -a android.intent.action.VIEW -n %s/%s -d \"%s\" --ez \"rtsp_tcp\" %b --ei \"network_caching\" %d -f 0x10000000",
+            String cmd = String.format("am start -a android.intent.action.VIEW -n %s/%s -d \"%s\" -t \"video/*\" --ez \"rtsp_tcp\" %b --ei \"network_caching\" %d --ez \"from_start\" true -f 0x14000000",
                     vlcPkg, vlcAct, rtspUrl, rtspTcp, caching);
             RootShell.execRoot(cmd);
         }
