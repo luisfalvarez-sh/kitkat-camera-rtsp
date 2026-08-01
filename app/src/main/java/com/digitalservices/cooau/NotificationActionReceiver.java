@@ -15,8 +15,8 @@ public class NotificationActionReceiver extends BroadcastReceiver {
         SharedPreferences prefs = context.getSharedPreferences(CameraWatchdogService.PREFS_NAME, Context.MODE_PRIVATE);
 
         if (CameraWatchdogService.ACTION_TOGGLE.equals(action)) {
-            boolean currentWatchdog = prefs.getBoolean(CameraWatchdogService.KEY_WATCHDOG, true);
-            prefs.edit().putBoolean(CameraWatchdogService.KEY_WATCHDOG, !currentWatchdog).apply();
+            boolean currentPaused = prefs.getBoolean(CameraWatchdogService.KEY_SERVICE_PAUSED, false);
+            prefs.edit().putBoolean(CameraWatchdogService.KEY_SERVICE_PAUSED, !currentPaused).apply();
 
             Intent serviceIntent = new Intent(context, CameraWatchdogService.class);
             serviceIntent.setAction(CameraWatchdogService.ACTION_TOGGLE);

@@ -61,7 +61,9 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (CameraWatchdogService.KEY_WATCHDOG.equals(key) || CameraWatchdogService.KEY_SERVICE_STATE.equals(key)) {
+        if (CameraWatchdogService.KEY_WATCHDOG.equals(key) ||
+                CameraWatchdogService.KEY_SERVICE_STATE.equals(key) ||
+                CameraWatchdogService.KEY_SERVICE_PAUSED.equals(key)) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -199,15 +201,15 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
     private void updateServiceUIStatus() {
         boolean isRunning = CameraWatchdogService.isServiceRunning(this);
-        boolean watchdogEnabled = prefs.getBoolean(CameraWatchdogService.KEY_WATCHDOG, true);
+        boolean isPaused = prefs.getBoolean(CameraWatchdogService.KEY_SERVICE_PAUSED, false);
 
         if (isRunning) {
-            if (watchdogEnabled) {
-                tvStatus.setText(getString(R.string.status_active));
-                tvStatus.setTextColor(Color.parseColor("#00E676"));
-            } else {
+            if (isPaused) {
                 tvStatus.setText(getString(R.string.status_paused));
                 tvStatus.setTextColor(Color.parseColor("#FFB300"));
+            } else {
+                tvStatus.setText(getString(R.string.status_active));
+                tvStatus.setTextColor(Color.parseColor("#00E676"));
             }
             btnToggleService.setText(getString(R.string.btn_stop_service));
             btnToggleService.setBackgroundColor(Color.parseColor("#FF5252"));

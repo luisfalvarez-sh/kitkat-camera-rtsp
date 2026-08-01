@@ -23,6 +23,7 @@ public class CameraWatchdogService extends Service {
     public static final String KEY_PERSISTENT_NOTIF = "persistent_notif";
     public static final String KEY_USE_ROOT = "use_root";
     public static final String KEY_SERVICE_STATE = "service_state";
+    public static final String KEY_SERVICE_PAUSED = "service_paused";
     public static final String KEY_CHECK_INTERVAL = "check_interval";
 
     public static final String ACTION_TOGGLE = "com.digitalservices.cooau.ACTION_TOGGLE";
@@ -90,6 +91,7 @@ public class CameraWatchdogService extends Service {
         isRunning = false;
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         prefs.edit().putBoolean(KEY_SERVICE_STATE, false).apply();
+        prefs.edit().putBoolean(KEY_SERVICE_PAUSED, false).apply();
 
         if (handler != null && watchdogRunnable != null) {
             handler.removeCallbacks(watchdogRunnable);
@@ -105,7 +107,7 @@ public class CameraWatchdogService extends Service {
 
     private void startForegroundServiceNotification() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        boolean watchdogActive = prefs.getBoolean(KEY_WATCHDOG, true);
+        boolean isPaused = prefs.getBoolean(KEY_SERVICE_PAUSED, false);
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingMainIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -118,8 +120,8 @@ public class CameraWatchdogService extends Service {
         stopIntent.setAction(ACTION_STOP);
         PendingIntent pendingStopIntent = PendingIntent.getBroadcast(this, 102, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        String toggleText = watchdogActive ? getString(R.string.notif_pause) : getString(R.string.notif_resume);
-        String statusText = watchdogActive ? getString(R.string.notif_active) : getString(R.string.notif_paused);
+        String toggleText = isPaused ? getString(R.string.notif_resume) : getString(R.string.notif_pause);
+        String statusText = isPaused ? getString(R.string.notif_paused) : getString(R.string.notif_active);
 
         Notification notification = new Notification.Builder(this)
                 .setContentTitle(getString(R.string.notif_title))
@@ -142,12 +144,13 @@ public class CameraWatchdogService extends Service {
                 try {
                     SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
                     boolean watchdogEnabled = prefs.getBoolean(KEY_WATCHDOG, true);
+                    boolean isPaused = prefs.getBoolean(KEY_SERVICE_PAUSED, false);
                     boolean useRoot = prefs.getBoolean(KEY_USE_ROOT, false);
                     int intervalSeconds = prefs.getInt(KEY_CHECK_INTERVAL, DEFAULT_CHECK_INTERVAL);
                     if (intervalSeconds < 2) intervalSeconds = 2;
                     nextIntervalMs = intervalSeconds * 1000L;
 
-                    if (watchdogEnabled) {
+                    if (watchdogEnabled && !isPaused) {
                         String targetPkg = prefs.getString(IntentHelper.KEY_VLC_PACKAGE, IntentHelper.DEFAULT_PKG);
                         String targetAct = prefs.getString(IntentHelper.KEY_VLC_ACTIVITY, IntentHelper.DEFAULT_ACT);
 
