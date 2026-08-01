@@ -2,6 +2,7 @@ package com.digitalservices.cooau;
 
 import android.app.ActivityManager;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
@@ -58,19 +59,30 @@ public class CameraWatchdogService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+
         if (intent != null && intent.getAction() != null) {
             String action = intent.getAction();
             if (ACTION_STOP.equals(action)) {
+                isRunning = false;
+                if (handler != null && watchdogRunnable != null) {
+                    handler.removeCallbacks(watchdogRunnable);
+                }
+                prefs.edit().putBoolean(KEY_SERVICE_STATE, false).apply();
+                stopForeground(true);
+                NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                if (nm != null) {
+                    nm.cancel(NOTIFICATION_ID);
+                }
                 stopSelf();
                 return START_NOT_STICKY;
             } else if (ACTION_TOGGLE.equals(action)) {
-                SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
                 boolean currentWatchdog = prefs.getBoolean(KEY_WATCHDOG, true);
                 prefs.edit().putBoolean(KEY_WATCHDOG, !currentWatchdog).apply();
+                startForegroundServiceNotification();
             }
         }
 
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         prefs.edit().putBoolean(KEY_SERVICE_STATE, true).apply();
 
         boolean persistentNotif = prefs.getBoolean(KEY_PERSISTENT_NOTIF, true);
@@ -179,6 +191,10 @@ public class CameraWatchdogService extends Service {
             handler.removeCallbacks(watchdogRunnable);
         }
         stopForeground(true);
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (nm != null) {
+            nm.cancel(NOTIFICATION_ID);
+        }
     }
 
     @Override
