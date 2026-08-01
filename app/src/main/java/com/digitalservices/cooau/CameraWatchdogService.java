@@ -21,12 +21,13 @@ public class CameraWatchdogService extends Service {
     public static final String KEY_PERSISTENT_NOTIF = "persistent_notif";
     public static final String KEY_USE_ROOT = "use_root";
     public static final String KEY_SERVICE_STATE = "service_state";
+    public static final String KEY_CHECK_INTERVAL = "check_interval";
 
     public static final String ACTION_TOGGLE = "com.digitalservices.cooau.ACTION_TOGGLE";
     public static final String ACTION_STOP = "com.digitalservices.cooau.ACTION_STOP";
 
     private static final int NOTIFICATION_ID = 1001;
-    private static final long CHECK_INTERVAL_MS = 7000; // 7 segundos
+    public static final int DEFAULT_CHECK_INTERVAL = 7; // 7 segundos predeterminado
 
     private Handler handler;
     private Runnable watchdogRunnable;
@@ -119,10 +120,14 @@ public class CameraWatchdogService extends Service {
         watchdogRunnable = new Runnable() {
             @Override
             public void run() {
+                long nextIntervalMs = DEFAULT_CHECK_INTERVAL * 1000L;
                 try {
                     SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
                     boolean watchdogEnabled = prefs.getBoolean(KEY_WATCHDOG, true);
                     boolean useRoot = prefs.getBoolean(KEY_USE_ROOT, false);
+                    int intervalSeconds = prefs.getInt(KEY_CHECK_INTERVAL, DEFAULT_CHECK_INTERVAL);
+                    if (intervalSeconds < 2) intervalSeconds = 2;
+                    nextIntervalMs = intervalSeconds * 1000L;
 
                     if (watchdogEnabled) {
                         boolean vlcRunning = isVlcRunning(useRoot);
@@ -134,7 +139,7 @@ public class CameraWatchdogService extends Service {
                 }
 
                 if (isRunning) {
-                    handler.postDelayed(this, CHECK_INTERVAL_MS);
+                    handler.postDelayed(this, nextIntervalMs);
                 }
             }
         };

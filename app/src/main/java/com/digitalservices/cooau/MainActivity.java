@@ -19,6 +19,7 @@ public class MainActivity extends Activity {
     private CheckBox cbRtspTcp;
     private EditText etVlcPackage;
     private EditText etVlcActivity;
+    private EditText etCheckInterval;
 
     private CheckBox cbBootStart;
     private CheckBox cbWatchdog;
@@ -57,6 +58,7 @@ public class MainActivity extends Activity {
         cbRtspTcp = (CheckBox) findViewById(R.id.cb_rtsp_tcp);
         etVlcPackage = (EditText) findViewById(R.id.et_vlc_package);
         etVlcActivity = (EditText) findViewById(R.id.et_vlc_activity);
+        etCheckInterval = (EditText) findViewById(R.id.et_check_interval);
 
         cbBootStart = (CheckBox) findViewById(R.id.cb_boot_start);
         cbWatchdog = (CheckBox) findViewById(R.id.cb_watchdog);
@@ -75,6 +77,7 @@ public class MainActivity extends Activity {
         cbRtspTcp.setChecked(prefs.getBoolean(IntentHelper.KEY_RTSP_TCP, true));
         etVlcPackage.setText(prefs.getString(IntentHelper.KEY_VLC_PACKAGE, IntentHelper.DEFAULT_PKG));
         etVlcActivity.setText(prefs.getString(IntentHelper.KEY_VLC_ACTIVITY, IntentHelper.DEFAULT_ACT));
+        etCheckInterval.setText(String.valueOf(prefs.getInt(CameraWatchdogService.KEY_CHECK_INTERVAL, CameraWatchdogService.DEFAULT_CHECK_INTERVAL)));
 
         cbBootStart.setChecked(prefs.getBoolean(CameraWatchdogService.KEY_BOOT_START, true));
         cbWatchdog.setChecked(prefs.getBoolean(CameraWatchdogService.KEY_WATCHDOG, true));
@@ -104,6 +107,14 @@ public class MainActivity extends Activity {
         String act = etVlcActivity.getText().toString().trim();
         if (act.isEmpty()) act = IntentHelper.DEFAULT_ACT;
         editor.putString(IntentHelper.KEY_VLC_ACTIVITY, act);
+
+        int interval = CameraWatchdogService.DEFAULT_CHECK_INTERVAL;
+        try {
+            interval = Integer.parseInt(etCheckInterval.getText().toString().trim());
+        } catch (Exception ignored) {
+        }
+        if (interval < 2) interval = 2;
+        editor.putInt(CameraWatchdogService.KEY_CHECK_INTERVAL, interval);
 
         editor.putBoolean(CameraWatchdogService.KEY_BOOT_START, cbBootStart.isChecked());
         editor.putBoolean(CameraWatchdogService.KEY_WATCHDOG, cbWatchdog.isChecked());

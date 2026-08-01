@@ -11,6 +11,7 @@
     <string name="vlc_pkg_label">Paquete de la App VLC:</string>
     <string name="vlc_act_label">Actividad Reproductora VLC:</string>
     <string name="behavior_header">Comportamiento del Guardián:</string>
+    <string name="interval_label">Intervalo de revisión (segundos):</string>
     <string name="boot_start_label">Iniciar al encender la tablet (Autostart)</string>
     <string name="watchdog_label">Monitorear y reactivar VLC si se cierra</string>
     <string name="persistent_notif_label">Proceso protegido (Notificación en barra)</string>

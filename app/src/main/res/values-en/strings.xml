@@ -11,6 +11,7 @@
     <string name="vlc_pkg_label">VLC App Package:</string>
     <string name="vlc_act_label">VLC Player Activity:</string>
     <string name="behavior_header">Watchdog Behavior:</string>
+    <string name="interval_label">Check interval (seconds):</string>
     <string name="boot_start_label">Autostart on boot</string>
     <string name="watchdog_label">Monitor and relaunch VLC if closed</string>
     <string name="persistent_notif_label">Protected process (Foreground Notification)</string>
