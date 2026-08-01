@@ -9,11 +9,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class CameraWatchdogService extends Service {
 
@@ -32,8 +33,7 @@ public class CameraWatchdogService extends Service {
     private static final int NOTIFICATION_ID = 1001;
     public static final int DEFAULT_CHECK_INTERVAL = 7; // 7 segundos predeterminado
 
-    private Handler handler;
-    private Runnable watchdogRunnable;
+    private ScheduledExecutorService executorService;
     private boolean isRunning = false;
 
     public static boolean isServiceRunning(Context context) {
@@ -54,8 +54,7 @@ public class CameraWatchdogService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        handler = new Handler(Looper.getMainLooper());
-        setupWatchdogRunnable();
+        executorService = Executors.newSingleThreadScheduledExecutor();
     }
 
     @Override
@@ -81,10 +80,64 @@ public class CameraWatchdogService extends Service {
 
         if (!isRunning) {
             isRunning = true;
-            handler.post(watchdogRunnable);
+            scheduleWatchdogLoop(0);
         }
 
         return START_STICKY;
+    }
+
+    private void scheduleWatchdogLoop(long delaySeconds) {
+        if (executorService != null && !executorService.isShutdown() && isRunning) {
+            executorService.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    long nextDelaySeconds = DEFAULT_CHECK_INTERVAL;
+                    try {
+                        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                        boolean watchdogEnabled = prefs.getBoolean(KEY_WATCHDOG, true);
+                        boolean isPaused = prefs.getBoolean(KEY_SERVICE_PAUSED, false);
+                        boolean useRoot = prefs.getBoolean(KEY_USE_ROOT, false);
+                        int intervalSeconds = prefs.getInt(KEY_CHECK_INTERVAL, DEFAULT_CHECK_INTERVAL);
+                        if (intervalSeconds < 2) intervalSeconds = 2;
+                        nextDelaySeconds = intervalSeconds;
+
+                        if (watchdogEnabled && !isPaused) {
+                            String targetPkg = prefs.getString(IntentHelper.KEY_VLC_PACKAGE, IntentHelper.DEFAULT_PKG);
+                            String targetAct = prefs.getString(IntentHelper.KEY_VLC_ACTIVITY, IntentHelper.DEFAULT_ACT);
+
+                            boolean isVideoPlayingTop = isVlcVideoPlayerTop(targetPkg, targetAct, useRoot);
+                            if (!isVideoPlayingTop) {
+                                IntentHelper.launchCamera(getApplicationContext(), false);
+                            }
+                        }
+                    } catch (Exception ignored) {
+                    }
+
+                    if (isRunning) {
+                        scheduleWatchdogLoop(nextDelaySeconds);
+                    }
+                }
+            }, delaySeconds, TimeUnit.SECONDS);
+        }
+    }
+
+    private boolean isVlcVideoPlayerTop(String targetPkg, String targetAct, boolean useRoot) {
+        if (useRoot && RootShell.isVlcVideoPlayerTopRoot(targetPkg, targetAct)) {
+            return true;
+        }
+
+        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        if (am != null) {
+            List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
+            if (tasks != null && !tasks.isEmpty()) {
+                ComponentName topActivity = tasks.get(0).topActivity;
+                if (topActivity != null) {
+                    return targetPkg.equals(topActivity.getPackageName()) &&
+                            targetAct.equals(topActivity.getClassName());
+                }
+            }
+        }
+        return false;
     }
 
     private void stopServiceInternal() {
@@ -93,8 +146,8 @@ public class CameraWatchdogService extends Service {
         prefs.edit().putBoolean(KEY_SERVICE_STATE, false).apply();
         prefs.edit().putBoolean(KEY_SERVICE_PAUSED, false).apply();
 
-        if (handler != null && watchdogRunnable != null) {
-            handler.removeCallbacks(watchdogRunnable);
+        if (executorService != null) {
+            executorService.shutdownNow();
         }
 
         stopForeground(true);
@@ -134,58 +187,6 @@ public class CameraWatchdogService extends Service {
                 .build();
 
         startForeground(NOTIFICATION_ID, notification);
-    }
-
-    private void setupWatchdogRunnable() {
-        watchdogRunnable = new Runnable() {
-            @Override
-            public void run() {
-                long nextIntervalMs = DEFAULT_CHECK_INTERVAL * 1000L;
-                try {
-                    SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-                    boolean watchdogEnabled = prefs.getBoolean(KEY_WATCHDOG, true);
-                    boolean isPaused = prefs.getBoolean(KEY_SERVICE_PAUSED, false);
-                    boolean useRoot = prefs.getBoolean(KEY_USE_ROOT, false);
-                    int intervalSeconds = prefs.getInt(KEY_CHECK_INTERVAL, DEFAULT_CHECK_INTERVAL);
-                    if (intervalSeconds < 2) intervalSeconds = 2;
-                    nextIntervalMs = intervalSeconds * 1000L;
-
-                    if (watchdogEnabled && !isPaused) {
-                        String targetPkg = prefs.getString(IntentHelper.KEY_VLC_PACKAGE, IntentHelper.DEFAULT_PKG);
-                        String targetAct = prefs.getString(IntentHelper.KEY_VLC_ACTIVITY, IntentHelper.DEFAULT_ACT);
-
-                        boolean isVideoPlayingTop = isVlcVideoPlayerTop(targetPkg, targetAct, useRoot);
-                        if (!isVideoPlayingTop) {
-                            IntentHelper.launchCamera(getApplicationContext(), false);
-                        }
-                    }
-                } catch (Exception ignored) {
-                }
-
-                if (isRunning) {
-                    handler.postDelayed(this, nextIntervalMs);
-                }
-            }
-        };
-    }
-
-    private boolean isVlcVideoPlayerTop(String targetPkg, String targetAct, boolean useRoot) {
-        if (useRoot && RootShell.isVlcVideoPlayerTopRoot(targetPkg, targetAct)) {
-            return true;
-        }
-
-        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        if (am != null) {
-            List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
-            if (tasks != null && !tasks.isEmpty()) {
-                ComponentName topActivity = tasks.get(0).topActivity;
-                if (topActivity != null) {
-                    return targetPkg.equals(topActivity.getPackageName()) &&
-                            targetAct.equals(topActivity.getClassName());
-                }
-            }
-        }
-        return false;
     }
 
     @Override
