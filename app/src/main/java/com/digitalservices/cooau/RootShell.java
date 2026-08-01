@@ -20,6 +20,27 @@ public class RootShell {
         }
     }
 
+    public static boolean isVlcVideoPlayerTopRoot(String targetPackage, String targetActivity) {
+        try {
+            Process process = Runtime.getRuntime().exec("su");
+            DataOutputStream os = new DataOutputStream(process.getOutputStream());
+            os.writeBytes("dumpsys activity top\n");
+            os.writeBytes("exit\n");
+            os.flush();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains(targetPackage) && line.contains(targetActivity)) {
+                    return true;
+                }
+            }
+            process.waitFor();
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
+
     public static boolean isVlcRunningRoot() {
         try {
             Process process = Runtime.getRuntime().exec("su");

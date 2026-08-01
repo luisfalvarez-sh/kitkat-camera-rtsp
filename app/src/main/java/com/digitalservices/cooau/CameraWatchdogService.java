@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -130,8 +131,11 @@ public class CameraWatchdogService extends Service {
                     nextIntervalMs = intervalSeconds * 1000L;
 
                     if (watchdogEnabled) {
-                        boolean vlcRunning = isVlcRunning(useRoot);
-                        if (!vlcRunning) {
+                        String targetPkg = prefs.getString(IntentHelper.KEY_VLC_PACKAGE, IntentHelper.DEFAULT_PKG);
+                        String targetAct = prefs.getString(IntentHelper.KEY_VLC_ACTIVITY, IntentHelper.DEFAULT_ACT);
+
+                        boolean isVideoPlayingTop = isVlcVideoPlayerTop(targetPkg, targetAct, useRoot);
+                        if (!isVideoPlayingTop) {
                             IntentHelper.launchCamera(getApplicationContext(), false);
                         }
                     }
@@ -145,19 +149,19 @@ public class CameraWatchdogService extends Service {
         };
     }
 
-    private boolean isVlcRunning(boolean useRoot) {
-        if (useRoot && RootShell.isVlcRunningRoot()) {
+    private boolean isVlcVideoPlayerTop(String targetPkg, String targetAct, boolean useRoot) {
+        if (useRoot && RootShell.isVlcVideoPlayerTopRoot(targetPkg, targetAct)) {
             return true;
         }
 
         ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         if (am != null) {
-            List<ActivityManager.RunningAppProcessInfo> processes = am.getRunningAppProcesses();
-            if (processes != null) {
-                for (ActivityManager.RunningAppProcessInfo processInfo : processes) {
-                    if (processInfo.processName.contains("org.videolan.vlc")) {
-                        return true;
-                    }
+            List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
+            if (tasks != null && !tasks.isEmpty()) {
+                ComponentName topActivity = tasks.get(0).topActivity;
+                if (topActivity != null) {
+                    return targetPkg.equals(topActivity.getPackageName()) &&
+                            targetAct.equals(topActivity.getClassName());
                 }
             }
         }
