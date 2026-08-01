@@ -187,6 +187,11 @@ public class CameraWatchdogService extends Service {
                 .build();
 
         startForeground(NOTIFICATION_ID, notification);
+
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (nm != null) {
+            nm.notify(NOTIFICATION_ID, notification);
+        }
     }
 
     @Override

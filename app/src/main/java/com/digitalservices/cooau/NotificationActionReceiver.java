@@ -24,7 +24,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
         } else if (CameraWatchdogService.ACTION_STOP.equals(action)) {
             Intent serviceIntent = new Intent(context, CameraWatchdogService.class);
             serviceIntent.setAction(CameraWatchdogService.ACTION_STOP);
-            context.stopService(serviceIntent);
+            context.startService(serviceIntent);
         }
     }
 }
