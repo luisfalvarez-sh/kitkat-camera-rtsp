@@ -64,21 +64,9 @@ public class CameraWatchdogService extends Service {
         if (intent != null && intent.getAction() != null) {
             String action = intent.getAction();
             if (ACTION_STOP.equals(action)) {
-                isRunning = false;
-                if (handler != null && watchdogRunnable != null) {
-                    handler.removeCallbacks(watchdogRunnable);
-                }
-                prefs.edit().putBoolean(KEY_SERVICE_STATE, false).apply();
-                stopForeground(true);
-                NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                if (nm != null) {
-                    nm.cancel(NOTIFICATION_ID);
-                }
-                stopSelf();
+                stopServiceInternal();
                 return START_NOT_STICKY;
             } else if (ACTION_TOGGLE.equals(action)) {
-                boolean currentWatchdog = prefs.getBoolean(KEY_WATCHDOG, true);
-                prefs.edit().putBoolean(KEY_WATCHDOG, !currentWatchdog).apply();
                 startForegroundServiceNotification();
             }
         }
@@ -98,6 +86,23 @@ public class CameraWatchdogService extends Service {
         return START_STICKY;
     }
 
+    private void stopServiceInternal() {
+        isRunning = false;
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        prefs.edit().putBoolean(KEY_SERVICE_STATE, false).apply();
+
+        if (handler != null && watchdogRunnable != null) {
+            handler.removeCallbacks(watchdogRunnable);
+        }
+
+        stopForeground(true);
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (nm != null) {
+            nm.cancel(NOTIFICATION_ID);
+        }
+        stopSelf();
+    }
+
     private void startForegroundServiceNotification() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         boolean watchdogActive = prefs.getBoolean(KEY_WATCHDOG, true);
@@ -105,13 +110,13 @@ public class CameraWatchdogService extends Service {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingMainIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent toggleIntent = new Intent(this, CameraWatchdogService.class);
+        Intent toggleIntent = new Intent(this, NotificationActionReceiver.class);
         toggleIntent.setAction(ACTION_TOGGLE);
-        PendingIntent pendingToggleIntent = PendingIntent.getService(this, 1, toggleIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(this, 101, toggleIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent stopIntent = new Intent(this, CameraWatchdogService.class);
+        Intent stopIntent = new Intent(this, NotificationActionReceiver.class);
         stopIntent.setAction(ACTION_STOP);
-        PendingIntent pendingStopIntent = PendingIntent.getService(this, 2, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingStopIntent = PendingIntent.getBroadcast(this, 102, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         String toggleText = watchdogActive ? getString(R.string.notif_pause) : getString(R.string.notif_resume);
         String statusText = watchdogActive ? getString(R.string.notif_active) : getString(R.string.notif_paused);
@@ -183,18 +188,7 @@ public class CameraWatchdogService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        isRunning = false;
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        prefs.edit().putBoolean(KEY_SERVICE_STATE, false).apply();
-
-        if (handler != null && watchdogRunnable != null) {
-            handler.removeCallbacks(watchdogRunnable);
-        }
-        stopForeground(true);
-        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (nm != null) {
-            nm.cancel(NOTIFICATION_ID);
-        }
+        stopServiceInternal();
     }
 
     @Override

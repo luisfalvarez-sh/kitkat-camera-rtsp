@@ -30,6 +30,16 @@
             android:exported="false" />
 
         <receiver
+            android:name="com.digitalservices.cooau.NotificationActionReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.digitalservices.cooau.ACTION_TOGGLE" />
+                <action android:name="com.digitalservices.cooau.ACTION_STOP" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
             android:name="com.digitalservices.cooau.BootReceiver"
             android:enabled="true"
             android:exported="true">
