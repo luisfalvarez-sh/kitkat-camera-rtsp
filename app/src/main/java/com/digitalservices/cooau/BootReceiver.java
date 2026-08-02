@@ -11,7 +11,7 @@ public class BootReceiver extends BroadcastReceiver {
     public static final String ACTION_HTC_QUICKBOOT = "com.htc.intent.action.QUICKBOOT_POWERON";
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, Intent intent) {
         if (intent == null || intent.getAction() == null) return;
 
         String action = intent.getAction();
@@ -20,17 +20,29 @@ public class BootReceiver extends BroadcastReceiver {
                 ACTION_HTC_QUICKBOOT.equals(action) ||
                 Intent.ACTION_REBOOT.equals(action)) {
 
-            SharedPreferences prefs = context.getSharedPreferences(CameraWatchdogService.PREFS_NAME, Context.MODE_PRIVATE);
-            boolean bootStart = prefs.getBoolean(CameraWatchdogService.KEY_BOOT_START, true);
+            // Ejecutar en hilo secundario con un delay de 3 segundos para evitar ANR de BroadcastQueue durante el arranque
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        // Esperar 3 segundos a que SuperSU y la interfaz del sistema se estabilicen
+                        Thread.sleep(3000);
 
-            if (bootStart) {
-                // 1. Iniciar servicio guardián
-                Intent serviceIntent = new Intent(context, CameraWatchdogService.class);
-                context.startService(serviceIntent);
+                        SharedPreferences prefs = context.getSharedPreferences(CameraWatchdogService.PREFS_NAME, Context.MODE_PRIVATE);
+                        boolean bootStart = prefs.getBoolean(CameraWatchdogService.KEY_BOOT_START, true);
 
-                // 2. Lanzar la transmisión de la cámara
-                IntentHelper.launchCamera(context, false);
-            }
+                        if (bootStart) {
+                            // 1. Iniciar servicio guardián
+                            Intent serviceIntent = new Intent(context, CameraWatchdogService.class);
+                            context.startService(serviceIntent);
+
+                            // 2. Lanzar transmisión de la cámara
+                            IntentHelper.launchCamera(context, false);
+                        }
+                    } catch (Exception ignored) {
+                    }
+                }
+            }).start();
         }
     }
 }
