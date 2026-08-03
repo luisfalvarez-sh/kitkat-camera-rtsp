@@ -30,14 +30,17 @@ public class BootReceiver extends BroadcastReceiver {
 
                         SharedPreferences prefs = context.getSharedPreferences(CameraWatchdogService.PREFS_NAME, Context.MODE_PRIVATE);
                         boolean bootStart = prefs.getBoolean(CameraWatchdogService.KEY_BOOT_START, true);
+                        boolean isPaused = prefs.getBoolean(CameraWatchdogService.KEY_SERVICE_PAUSED, false);
 
                         if (bootStart) {
                             // 1. Iniciar servicio guardián
                             Intent serviceIntent = new Intent(context, CameraWatchdogService.class);
                             context.startService(serviceIntent);
 
-                            // 2. Lanzar transmisión de la cámara
-                            IntentHelper.launchCamera(context, false);
+                            // 2. Lanzar transmisión de la cámara SOLO SI el guardián NO está pausado
+                            if (!isPaused) {
+                                IntentHelper.launchCamera(context, false);
+                            }
                         }
                     } catch (Exception ignored) {
                     }
