@@ -7,6 +7,9 @@ import java.io.InputStreamReader;
 public class RootShell {
 
     public static boolean execRoot(String command) {
+        if (command == null || command.contains(";") || command.contains("&&") || command.contains("||") || command.contains("`")) {
+            return false;
+        }
         try {
             Process process = Runtime.getRuntime().exec("su");
             DataOutputStream os = new DataOutputStream(process.getOutputStream());

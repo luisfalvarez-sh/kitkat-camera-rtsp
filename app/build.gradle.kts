@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId = "com.digitalservices.cooau"
         minSdk = 19
-        targetSdk = 36
+        targetSdk = 19
         versionCode = 1
         versionName = "1.0"
     }
@@ -28,6 +28,5 @@ android {
 }
 
 dependencies {
-    // Para Android 4.4, no requerimos Compose ni librerías pesadas
+    // Para Android 4.4 KitKat nativo puro, no se requieren dependencias externas
 }
-
